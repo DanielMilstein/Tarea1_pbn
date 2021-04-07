@@ -13,6 +13,7 @@ int tipo_juego(char tipo[2]){
 
 int main(int argc, char** argv)
 {
+<<<<<<< HEAD
 	//Si no se le pasan los argumentos al programa, termina solo.
 	if (argc<4){
 		printf("Faltan argumentos\n");
@@ -25,5 +26,9 @@ int main(int argc, char** argv)
 
 
 	
+=======
+	printf("%s\n", argv[1]);
+	printf("Hola\n");
+>>>>>>> fd450ed106a30be88177e0670f8164222ea1aca8
 	return 0;
 }
