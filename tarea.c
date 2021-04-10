@@ -14,6 +14,7 @@ int tipo_juego(char tipo[2]){
 
 }
 
+char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100];
 
 void parse_tablero(char* nombre_archivo){
 
@@ -28,16 +29,17 @@ void parse_tablero(char* nombre_archivo){
  			fscanf(archivo, "%s", dato);
  			datos[i] = dato;
  			printf("%s", datos[i]);
- 			i++
+ 			i++;
 			}
 		
 		
 	fclose(archivo);
+	}
 	return;
 
 }
 
-char *arr[GRID_SIZE][GRID_SIZE];
+
 
 int board(void) {
     for (int a = 0; a < GRID_SIZE; a++) {
@@ -91,6 +93,8 @@ int board(void) {
 int main(int argc, char** argv)
 {
 	board();
+	
+	parse_tablero(argv);
 	
 	//Si no se le pasan los argumentos al programa, termina solo.
 	if (argc<4){
