@@ -27,6 +27,8 @@ void parse_tablero(char* nombre_archivo){
   		while(!feof(archivo)){
  			fscanf(archivo, "%s", dato);
  			datos[i] = dato;
+ 			printf("%s", datos[i]);
+ 			i++
 			}
 		
 		
