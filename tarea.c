@@ -20,10 +20,16 @@ void parse_tablero(char* nombre_archivo){
 	FILE* archivo;
 	archivo = fopen(nombre_archivo, "r");
 
-
-
-
-
+ 	if (archivo == NULL) {
+    		printf("No se pudo abrir el archivo");
+    	} else {
+  		int i=0;
+  		while(!feof(archivo)){
+ 			fscanf(archivo, "%s", dato);
+ 			datos[i] = dato;
+			}
+		
+		
 	fclose(archivo);
 	return;
 
