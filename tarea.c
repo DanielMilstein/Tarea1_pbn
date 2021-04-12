@@ -13,8 +13,11 @@ int tipo_juego(char tipo[2]){
 	else return 9;
 
 }
-
+// arr es array que guarda tablero
 char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100];
+
+
+
 
 void parse_tablero(char* nombre){
 
@@ -129,7 +132,15 @@ int main(int argc, char** argv)
 {
 	//board();
 	
-	parse_tablero(argv[1]);
+	//parse_tablero(argv[2]);
+
+
+	// char* tabla[] = {"__________","__________","__________","__________",
+	// "__________","__________","__________","__________","__________","__________"};
+
+	// print_tablero(tabla);
+
+
 
 	// //Si no se le pasan los argumentos al programa, termina solo.
 	// if (argc<4){
