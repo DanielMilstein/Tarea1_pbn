@@ -1,6 +1,7 @@
 #include<stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include<malloc.h> 
 #define GRID_SIZE 10
 
 //1 -> true 
@@ -14,13 +15,30 @@ int tipo_juego(char tipo[2]){
 
 }
 // arr es array que guarda tablero
-char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100];
+char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100], *datos_clean[100];
 
+// Cuenta las lineas del archivo para saber cuantos barcos hay
+int contar_lineas(char* nombre){
+	char nombre_archivo[15];
+	sprintf(nombre_archivo, "./%s.txt", nombre);
+	FILE* archivo;
+	int lineas = 0;
+	char ch;
 
+	archivo = fopen(nombre_archivo, "r");
+	while (!feof(archivo)){
+		ch = fgetc(archivo);
+  		if(ch == '\n'){
+		    lineas++;
+  		}
+	}
+	fclose(archivo);
+	return lineas;
+}
 
 
 void parse_tablero(char* nombre){
-
+	// Parte archivo
 	char nombre_archivo[15];
 	sprintf(nombre_archivo, "./%s.txt", nombre);
 	printf("%s\n", nombre_archivo);
@@ -37,13 +55,21 @@ void parse_tablero(char* nombre){
 
  			fscanf(archivo, "%s", dato);
  			datos[i] = dato;
- 			printf("%s\n", datos[i]);
  			i++;
 			}
 		
 		
 	fclose(archivo);
 	}
+
+	// Parte separar linea
+	int lineas = contar_lineas(nombre);
+	char *token;
+
+	for (size_t x=0; x <= lineas;x++){
+		printf("hola\n");
+	}
+
 	return;
 
 }
@@ -56,39 +82,7 @@ void board() {
 			arr[a][b] = "[_]";
         }
     }
-/*	arr[0][0]= " ";
-	arr[1][0]= "0";
-	arr[2][0]= "1";
-	arr[3][0]= "2";
-	arr[4][0]= "3";
-	arr[5][0]= "4";
-	arr[6][0]= "5";
-	arr[7][0]= "6";
-	arr[8][0]= "7";
-	arr[9][0]= "8";
-	arr[10][0]= "9";
-	
-	char x;
-	for(int i=1; i< GRID_SIZE-1; i++){
-		x= i + '0';
-		arr[i][0]= x;
 
-		}
-		
-		
-	arr[0][1]= " a ";
-	arr[0][2]= " b ";
-	arr[0][3]= " c ";
-	arr[0][4]= " d ";
-	arr[0][5]= " e ";
-	arr[0][6]= " f ";
-	arr[0][7]= " g ";
-	arr[0][8]= " h ";
-	arr[0][9]= " i ";
-	arr[0][10]=" j ";
-*/
-	
-	
     printf("\n");
 
     for (int a = 0; a < GRID_SIZE; a++) {
@@ -132,7 +126,7 @@ int main(int argc, char** argv)
 {
 	//board();
 	
-	//parse_tablero(argv[2]);
+	parse_tablero(argv[1]);
 
 
 	// char* tabla[] = {"__________","__________","__________","__________",
