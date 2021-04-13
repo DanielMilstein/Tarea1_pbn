@@ -1,7 +1,6 @@
 #include<stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include<malloc.h> 
 #define GRID_SIZE 10
 
 //1 -> true 
@@ -61,14 +60,61 @@ void parse_tablero(char* nombre){
 		
 	fclose(archivo);
 	}
-
+	//Hasta aqui abrimos el archivo solamente y lo pasamos a un array todo junto.
 	// Parte separar linea
-	int lineas = contar_lineas(nombre);
-	char *token;
 
-	for (size_t x=0; x <= lineas;x++){
-		printf("hola\n");
+
+	const char s[] = ";\n";
+	int lineas = contar_lineas(nombre);
+	char** barcos[lineas];
+	char** barco;
+	barco = malloc(5*sizeof(char));
+	char *token;
+	int porte;
+	for (int x=0; x < lineas;x++){
+		//Primer token (nombre del barco)
+		token = strtok(datos[x], s);
+		int f = 0;
+		while (token != NULL){
+			barco[f] = token;
+			f++;
+			token = strtok(NULL, s);
+		}
+
+		if (strcmp(barco[4], "h")==0){ 
+			porte = atoi(barco[1]);
+			char * quito[porte]; //Array de strings para cada coordenada
+			//quito = malloc(3*porte*sizeof(char));
+
+
+			for (int c=0; c<porte; c++){
+				char coordenadaL; //Coordenada letra
+				char coordenadaN; //Coordenada numero
+				char coordenada[3];
+
+				coordenadaL = barco[2][0] + c;
+				coordenadaN = barco[3][0];
+				coordenada[0] = coordenadaL;
+				coordenada[1] = coordenadaN;
+				coordenada[2] = '\0';
+				 
+				//strcpy(quito[c], coordenada);
+				quito[c] = coordenada;
+				printf("%s\n", coordenada);
+
+			}
+			// Agrego coordenadas de barco a barcos
+			barcos[x] = quito;
+
+
+		}
+
+
 	}
+
+	printf("%s\n", barcos[0][0]);
+	printf("%s\n", barcos[0][1]);
+	printf("%s\n", barcos[0][2]);
 
 	return;
 
