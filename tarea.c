@@ -1,6 +1,8 @@
 #include<stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include<stdbool.h>
+#include<time.h>
 #define GRID_SIZE 10
 
 //1 -> true 
@@ -15,6 +17,8 @@ int tipo_juego(char tipo[2]){
 }
 // arr es array que guarda tablero
 char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100];
+
+//srand(time(NULL));
 
 //Jugador 1
 char* tablaBarcosJ1[GRID_SIZE][GRID_SIZE] = {"__________","__________","__________","__________","__________",
@@ -47,12 +51,11 @@ int contar_lineas(char* nombre){
 	fclose(archivo);
 	return lineas;
 }
-int letra_a_numero(char letra){
+
+int letra_a_numero(char letra){ //revisar, no corre 
 	char letra = coord[0] -49;
 	int lnum = letra;
 	return lnum;
-
-
 }
 
 int check_no_overlap(int x, int y, char* tabla[GRID_SIZE][GRID_SIZE]){
@@ -86,7 +89,7 @@ void parse_tablero(char* nombre, char* tabla[GRID_SIZE][GRID_SIZE]){
 	
 	archivo = fopen(nombre_archivo, "r");
 
- 	if (archivp == NULL) {
+ 	if (archivo == NULL) {
     		printf("No se pudo abrir el archivo\n");
     	} 
     else {
@@ -119,7 +122,9 @@ void parse_tablero(char* nombre, char* tabla[GRID_SIZE][GRID_SIZE]){
 			f++;
 			token = strtok(NULL, s);
 		}
-
+		
+		//Tengo que hacer una sumatoria de los largos de los barcos para la condicion de termino (s)
+		
 		if (strcmp(barco[4], "h\0")==0){ //No estoy seguro del 0
 			porte = atoi(barco[1]);
 
@@ -134,13 +139,12 @@ void parse_tablero(char* nombre, char* tabla[GRID_SIZE][GRID_SIZE]){
 				coordenada[0] = coordenadaL;
 				coordenada[1] = coordenadaN;
 				coordenada[2] = '\0';
-				add_ship_coord()
+				//add_ship_coord();
 
 
 			}
 		}
-		else
-			if (strcmp(barco[4], "v\0")==0){ //No estoy seguro del 0
+		else if (strcmp(barco[4], "v\0")==0){ //No estoy seguro del 0
 			porte = atoi(barco[1]);
 
 			for (int c=0; c<porte; c++){
@@ -157,30 +161,10 @@ void parse_tablero(char* nombre, char* tabla[GRID_SIZE][GRID_SIZE]){
 
 
 			}
+		}
 	}
-
-
 	return;
 
-}
-
-
-
-void board() {
-    for (int a = 0; a < GRID_SIZE; a++) {
-        for (int b = 0; b < GRID_SIZE; b++) {
-			arr[a][b] = "[_]";
-        }
-    }
-
-    printf("\n");
-
-    for (int a = 0; a < GRID_SIZE; a++) {
-        for (int b = 0; b < GRID_SIZE; b++) {
-            	printf("%s", arr[a][b]);
-        }
-        printf("\n");
-    }
 }
 
 void crear_tablero() {
@@ -190,9 +174,6 @@ void crear_tablero() {
         }
     }
 }
-
-
-
 
 void print_tablero(char** array){
 
@@ -209,22 +190,124 @@ void print_tablero(char** array){
 	printf("   A  B  C  D  E  F  G  H  I  J\n");
 }
 
-
-
-
-int main(int argc, char** argv)
-{
+int main(int argc, char** argv){
 	//board();
 	
-	parse_tablero(argv[1]);
+	//parse_tablero(argv[1], arr);
 
 
 	// char* tabla[] = {"__________","__________","__________","__________",
 	// "__________","__________","__________","__________","__________","__________"};
 
 	// print_tablero(tabla);
-
-
+	
+	
+	char coordenadas[3];
+	int fila;
+	int columna;
+	int aciertosj1=0;
+	int aciertosj2=0;
+	bool gano= false;
+	int turno= 0;
+	
+	if(argv[1]=="-v"){
+	
+		while (gano== false){
+		printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+		scanf("%s", coordenadas);
+	
+		if(strlen(coordenadas)>3){
+			printf("Coordenadas invalidas\n"); //valido el largo
+		} else if(strlen(coordenadas)==3){
+			fila= (int) coordenadas[2]; 
+		}
+	
+		columna = letra_a_numero(coordenadas[0]);
+	
+		if( columna > 9 || fila > 9){
+			printf("Coordenadas invalidas\n"); //verifico que esten dentro del tablero
+		}else if(tablaBarcosJ1[fila][columna]== "[_]"){
+			printf("Al Agua!\n");
+			arr[fila][columna]= "[.]";
+			print_tablero(arr);
+		} else if(tablaBarcosJ1[fila][columna]!="[_]" && tablaBarcosJ1[fila][columna]!= "[.]" && tablaBarcosJ1[fila][columna]!= "[X]"){
+			arr[fila][columna]="[X]";
+			printf("Impacto!\n");
+			print_tablero(arr);
+			aciertosj1++;
+			}
+			turno++;
+		printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+		scanf("%s", coordenadas);
+	
+		if(strlen(coordenadas)>3){
+			printf("Coordenadas invalidas\n"); //valido el largo
+		} else if(strlen(coordenadas)==3){
+			fila= (int) coordenadas[2]; 
+		}
+	
+		columna = letra_a_numero(coordenadas[0]);
+	
+		if( columna > 9 || fila > 9){
+			printf("Coordenadas invalidas\n"); //verifico que esten dentro del tablero
+		}else if(tablaBarcosJ2[fila][columna]== "[_]"){
+			printf("Al Agua!\n");
+			arr[fila][columna]= "[.]";
+			print_tablero(arr);
+		} else if(tablaBarcosJ2[fila][columna]!="[_]" && tablaBarcosJ2[fila][columna]!= "[.]" && tablaBarcosJ2[fila][columna]!= "[X]"){
+			arr[fila][columna]="[X]";
+			printf("Impacto!\n");
+			print_tablero(arr);
+			aciertosj1++;
+			}
+		turno++;
+		/*
+		if (longitud_barcos=aciertosj1){
+			gano== true;
+			printf("Gana jugador 1\n");
+			break;
+		}else if(longitus_barcos=aciertosj2){
+			gano== true;
+			printf("Gana jugador 2\n");
+			break;}*/
+		}
+	}else if(argv[1]=="-a"){
+	
+	while (gano== false){
+	
+		printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+		scanf("%s", coordenadas);
+	
+		if(strlen(coordenadas)>3){
+			printf("Coordenadas invalidas\n"); //valido el largo
+		} else if(strlen(coordenadas)==3){
+			fila= (int) coordenadas[2]; 
+		}
+	
+		columna = letra_a_numero(coordenadas[0]);
+	
+		if( columna > 9 || fila > 9){
+			printf("Coordenadas invalidas\n"); //verifico que esten dentro del tablero
+		}else if(tablaBarcosJ1[fila][columna]== "[_]"){
+			printf("Al Agua!\n");
+			arr[fila][columna]= "[.]";
+			print_tablero(arr);
+		} else if(tablaBarcosJ1[fila][columna]!="[_]" && tablaBarcosJ1[fila][columna]!= "[.]" && tablaBarcosJ1[fila][columna]!= "[X]"){
+			arr[fila][columna]="[X]";
+			printf("Impacto!\n");
+			print_tablero(arr);
+			aciertosj1++;
+			}
+		turno++;
+		/*
+		if (longitud_barcos=aciertosj1){
+			gano== true;
+			printf("Gana jugador 1\n");
+			break;
+			}*/
+		}
+	
+	}
 
 	// //Si no se le pasan los argumentos al programa, termina solo.
 	// if (argc<4){
@@ -253,5 +336,6 @@ int main(int argc, char** argv)
 
 	// else printf("Modo de juego no valido.\n");
 
-	return 0;
-}
+	return 0;	
+}	
+
