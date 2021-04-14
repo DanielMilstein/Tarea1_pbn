@@ -222,7 +222,7 @@ int main(int argc, char** argv)
 {
 	//board();
 	
-	parse_tablero(argv[1]);
+	
 
 
 	// char* tabla[] = {"__________","__________","__________","__________",
