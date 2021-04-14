@@ -17,20 +17,25 @@ int tipo_juego(char tipo[2]){
 char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100];
 
 //Jugador 1
-char* tablaBarcosJ1[GRID_SIZE][GRID_SIZE] = {"__________","__________","__________","__________","__________",
-									  		"__________","__________","__________","__________","__________"};
+char tablaBarcosJ1[GRID_SIZE][GRID_SIZE+1];
 
 //Jugador 2 o automatico
-char* tablaBarcosJ2[GRID_SIZE][GRID_SIZE] = {"__________","__________","__________","__________","__________",
-									  		"__________","__________","__________","__________","__________"};
+char tablaBarcosJ2[GRID_SIZE][GRID_SIZE+1];
 
 // transformacion de char a indice para lista
 //a->97 0 ->48
 //... 'a'-49
-
+void crear_tablero(char tabla[10][11]) {//ready
+    for (int a = 0; a < 10; a++) {
+        for (int b = 0; b < 10; b++) {
+			tabla[a][b] = '_';
+        }
+        tabla[a][10] = '\0';
+    }
+}
 
 // Cuenta las lineas del archivo para saber cuantos barcos hay
-int contar_lineas(char* nombre){
+int contar_lineas(char* nombre){//ready
 	char nombre_archivo[15];
 	sprintf(nombre_archivo, "./%s.txt", nombre);
 	FILE* archivo;
@@ -47,7 +52,7 @@ int contar_lineas(char* nombre){
 	fclose(archivo);
 	return lineas;
 }
-int letra_a_numero(char letra){
+int letra_a_numero(char letra){//ready
 	char letra = coord[0] -49;
 	int lnum = letra;
 	return lnum;
@@ -55,21 +60,21 @@ int letra_a_numero(char letra){
 
 }
 
-int check_no_overlap(int x, int y, char* tabla[GRID_SIZE][GRID_SIZE]){
+int check_no_overlap(int x, int y, char tabla[GRID_SIZE][GRID_SIZE]){//ready
 	for (int i=0; i<GRID_SIZE; i++){
 		for (int j=0; j<GRID_SIZE; i++){
-			if (*tabla[i][j] != '_') return 0;
+			if (tabla[i][j] != '_') return 0;
 		}
 	}
 	return 1;
 }
 
-void add_ship_coord(char coord[3], char* tabla[GRID_SIZE][GRID_SIZE], char ship){
+void add_ship_coord(char coord[3], char* tabla[GRID_SIZE][GRID_SIZE], char ship){ //ready pero sin probar
 	int letra, numero;
 	letra = letra_a_numero(coord[0]);
 	numero = coord[1];
 	if (check_no_overlap(letra, numero, tabla)){
-		*tabla[letra][numero] = ship;
+		tabla[letra][numero] = ship;
 	}
 	else{
 		printf("Archivo contiene coordenadas incorrectas, hay un barco encima de otro\n");
@@ -182,12 +187,13 @@ void board() {
         printf("\n");
     }
 }
-
-void crear_tablero() {
-    for (int a = 0; a < GRID_SIZE; a++) {
-        for (int b = 0; b < GRID_SIZE; b++) {
-			arr[a][b] = "[_]";
+//Hay que pasarle un array asi vacio para cada tablero de barcos o ataque
+void crear_tablero(char tabla[10][11]) {
+    for (int a = 0; a < 10; a++) {
+        for (int b = 0; b < 10; b++) {
+			tabla[a][b] = '_';
         }
+        tabla[a][10] = '\0';
     }
 }
 
