@@ -14,7 +14,20 @@ int tipo_juego(char tipo[2]){
 
 }
 // arr es array que guarda tablero
-char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100], *datos_clean[100];
+char *arr[GRID_SIZE][GRID_SIZE], *datos[100], dato[100];
+
+//Jugador 1
+char* tablaBarcosJ1[GRID_SIZE][GRID_SIZE] = {"__________","__________","__________","__________","__________",
+									  		"__________","__________","__________","__________","__________"};
+
+//Jugador 2 o automatico
+char* tablaBarcosJ2[GRID_SIZE][GRID_SIZE] = {"__________","__________","__________","__________","__________",
+									  		"__________","__________","__________","__________","__________"};
+
+// transformacion de char a indice para lista
+//a->97 0 ->48
+//... 'a'-49
+
 
 // Cuenta las lineas del archivo para saber cuantos barcos hay
 int contar_lineas(char* nombre){
@@ -34,9 +47,37 @@ int contar_lineas(char* nombre){
 	fclose(archivo);
 	return lineas;
 }
+int letra_a_numero(char letra){
+	char letra = coord[0] -49;
+	int lnum = letra;
+	return lnum;
 
 
-void parse_tablero(char* nombre){
+}
+
+int check_no_overlap(int x, int y, char* tabla[GRID_SIZE][GRID_SIZE]){
+	for (int i=0; i<GRID_SIZE; i++){
+		for (int j=0; j<GRID_SIZE; i++){
+			if (*tabla[i][j] != '_') return 0;
+		}
+	}
+	return 1;
+}
+
+void add_ship_coord(char coord[3], char* tabla[GRID_SIZE][GRID_SIZE], char ship){
+	int letra, numero;
+	letra = letra_a_numero(coord[0]);
+	numero = coord[1];
+	if (check_no_overlap(letra, numero, tabla)){
+		*tabla[letra][numero] = ship;
+	}
+	else{
+		printf("Archivo contiene coordenadas incorrectas, hay un barco encima de otro\n");
+	}
+}
+
+
+void parse_tablero(char* nombre, char* tabla[GRID_SIZE][GRID_SIZE]){
 	// Parte archivo
 	char nombre_archivo[15];
 	sprintf(nombre_archivo, "./%s.txt", nombre);
@@ -45,7 +86,7 @@ void parse_tablero(char* nombre){
 	
 	archivo = fopen(nombre_archivo, "r");
 
- 	if (0) {
+ 	if (archivp == NULL) {
     		printf("No se pudo abrir el archivo\n");
     	} 
     else {
@@ -66,9 +107,7 @@ void parse_tablero(char* nombre){
 
 	const char s[] = ";\n";
 	int lineas = contar_lineas(nombre);
-	char** barcos[lineas];
 	char** barco;
-	barco = malloc(5*sizeof(char));
 	char *token;
 	int porte;
 	for (int x=0; x < lineas;x++){
@@ -81,40 +120,45 @@ void parse_tablero(char* nombre){
 			token = strtok(NULL, s);
 		}
 
-		if (strcmp(barco[4], "h")==0){ 
+		if (strcmp(barco[4], "h\0")==0){ //No estoy seguro del 0
 			porte = atoi(barco[1]);
-			char * quito[porte]; //Array de strings para cada coordenada
-			//quito = malloc(3*porte*sizeof(char));
-
 
 			for (int c=0; c<porte; c++){
 				char coordenadaL; //Coordenada letra
 				char coordenadaN; //Coordenada numero
 				char coordenada[3];
+				char quito = 'A';
 
 				coordenadaL = barco[2][0] + c;
 				coordenadaN = barco[3][0];
 				coordenada[0] = coordenadaL;
 				coordenada[1] = coordenadaN;
 				coordenada[2] = '\0';
-				 
-				//strcpy(quito[c], coordenada);
-				quito[c] = coordenada;
-				printf("%s\n", coordenada);
+				add_ship_coord()
+
 
 			}
-			// Agrego coordenadas de barco a barcos
-			barcos[x] = quito;
-
-
 		}
+		else
+			if (strcmp(barco[4], "v\0")==0){ //No estoy seguro del 0
+			porte = atoi(barco[1]);
+
+			for (int c=0; c<porte; c++){
+				char coordenadaL; //Coordenada letra
+				char coordenadaN; //Coordenada numero
+				char coordenada[3];
+
+				coordenadaL = barco[2][0];
+				coordenadaN = barco[3][0] + c;
+				coordenada[0] = coordenadaL;
+				coordenada[1] = coordenadaN;
+				coordenada[2] = '\0';
+				
 
 
+			}
 	}
 
-	printf("%s\n", barcos[0][0]);
-	printf("%s\n", barcos[0][1]);
-	printf("%s\n", barcos[0][2]);
 
 	return;
 
