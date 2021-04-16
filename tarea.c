@@ -19,7 +19,7 @@ int tipo_juego(char tipo[2]){
 // arr es array que guarda tablero
 char arr1[10][11];
 char arr2[10][11];
-char *datos[100];
+char datos[100][100];
 char dato[100];
 
 
@@ -83,8 +83,8 @@ int add_ship_coord(char coord[3], char tabla[10][11], char ship){
 	int letra, numero;
 	letra = letraMAYUS_a_numero(coord[0]);
 	numero = coord[1]-'0';
-	printf("%d, %d\n", letra, numero);
-	if (1){ //check_no_overlap(letra, numero, tabla)
+
+	if (check_no_overlap(numero, letra, tabla)){ //check_no_overlap(letra, numero, tabla)
 		tabla[numero][letra] = ship;
 		return 1;
 	}
@@ -101,6 +101,7 @@ int parse_tablero(char* nombre, char tabla[10][11]){
 	char nombre_archivo[15];
 	sprintf(nombre_archivo, "./%s.txt", nombre);
 	
+	
 	FILE* archivo;
 	
 	archivo = fopen(nombre_archivo, "r");
@@ -111,9 +112,9 @@ int parse_tablero(char* nombre, char tabla[10][11]){
     else {
   		int i=0;
   		while(!feof(archivo)){
-
  			fscanf(archivo, "%s", dato);
- 			datos[i] = dato;
+
+ 			strcpy(datos[i], dato);
  			i++;
 			}
 		
@@ -123,7 +124,7 @@ int parse_tablero(char* nombre, char tabla[10][11]){
 	}
 	//Hasta aqui abrimos el archivo solamente y lo pasamos a un array todo junto.
 	// Parte separar linea
-
+	
 
 	const char s[] = ";\n";
 	int lineas = contar_lineas(nombre);
@@ -137,16 +138,11 @@ int parse_tablero(char* nombre, char tabla[10][11]){
 		int f = 0;
 		while (token != NULL){
 			barco[f] = token;
-			printf("%s\n", token);
+
 			f++;
 			token = strtok(NULL, s);
 			
 		}
-		
-		// for(int i=0; i< lineas; i++){
-		// 	longitud= atoi(barco[1]);
-		// 	longitud_barcos= longitud_barcos + longitud;
-		// }
 		
 		if (barco[4][0] == 'h'){
 			porte = atoi(barco[1]);
@@ -162,7 +158,7 @@ int parse_tablero(char* nombre, char tabla[10][11]){
 				coordenada[0] = coordenadaL;
 				coordenada[1] = coordenadaN;
 				coordenada[2] = '\0';
-				printf("%s\n", coordenada);
+
 				if (!add_ship_coord(coordenada, tabla, 65 + x)) return 0;
 			}
 		}
@@ -212,12 +208,44 @@ void print_tablero(char array[10][11]){
 	printf("   A  B  C  D  E  F  G  H  I  J\n");
 }
 
-void ataque(char tablero[10][11], char arr[10][11], int aciertos, char coordenadas[4]){
+void hundido(char tablero[10][11], char B){
+	int f = 0;
+	for(int a=0; a<GRID_SIZE; a++){
+		for(int b=0; b<GRID_SIZE;b++){
+			if(tablero[a][b]==B) f = 1;
+		}
+	}
+	if (!f) printf("Hundido!\n"); 	
+	return;		
+}
+
+int termino(char tablero[10][11], int turno){
+	int f = 0;
+	for(int a=0; a<GRID_SIZE; a++){
+		for(int b=0; b<GRID_SIZE;b++){
+			if(tablero[a][b]!='_') f = 1;
+		}
+	}
+	if (!f){
+		int x = turno % 2;
+		if (x) {
+			printf("Gana jugador 1!\n");
+
+		}
+		else printf("Gana jugador 2!\n");
+		return 1;
+	} 	
+	return 0;		
+}
+
+
+int ataque(char tablero[10][11], char arr[10][11], char coordenadas[4]){\
 	int fila;
 	int columna;
-	
+	//printf("Jugador %d\n", (turno%2)+1);
 		if(strlen(coordenadas)>3){
 			printf("Coordenadas invalidas\n"); //valido el largo
+			return 0;
 		} else if(strlen(coordenadas)==3){
 			fila= (coordenadas[2] - '0'); 
 		}
@@ -225,25 +253,34 @@ void ataque(char tablero[10][11], char arr[10][11], int aciertos, char coordenad
 
 		if( columna <= 9 && fila <= 9 && coordenadas[0]<=106 && coordenadas[0]>=97){
 			
-		 	if(tablero[fila][columna]== '_'){
+		 	if(tablero[fila][columna]== '_' && arr[fila][columna]!= '.' && arr[fila][columna]!= 'X'){
 				printf("Al Agua!\n");
 				arr[fila][columna]= '.';
 				print_tablero(arr);
+				
+				return 1;
 			
 			}
 			else 
-				if(tablero[fila][columna]!= '_' && tablero[fila][columna]!= '.' 
-											&& tablero[fila][columna]!= 'X'){
+				if(tablero[fila][columna]!= '_' && arr[fila][columna]!= '.' && arr[fila][columna]!= 'X'){
+					
+					char B = tablero[fila][columna];
+					printf("%c\n", B);
 					arr[fila][columna]='X';
 					tablero[fila][columna] = '_';
 					printf("Impacto!\n");
+					hundido(tablero, B);
 					print_tablero(arr);
-					aciertos++;
+					
+					return 1;
 			}
-
-			}
-			else printf("Coordenadas invalidas\n");
-	return;
+			else{
+			printf("Coordenadas invalidas o repetidas\n");
+			return 0;	
+		}
+		}
+		 
+	return 0;	
 }
 
 void coordenadasCPU(char res[4]){
@@ -257,88 +294,86 @@ void coordenadasCPU(char res[4]){
 		
 	
 int main(int argc, char** argv){
-	
 
-	
 	crear_tablero(arr1);
 	crear_tablero(arr2);
 	crear_tablero(tablaBarcosJ1);
 	crear_tablero(tablaBarcosJ2);
-	if (!parse_tablero(argv[1], arr1)) return 0; // cambiar de vuelta a argv[2]
-	if (!parse_tablero(argv[1], arr2)) return 0; // cambiar de vuelta a argv[3]
-
-	print_tablero(arr1);
-	print_tablero(arr2);
-
+	if (!parse_tablero(argv[2], tablaBarcosJ1)) return 0; // cambiar de vuelta a argv[2]
+	if (!parse_tablero(argv[3], tablaBarcosJ2)) return 0; // cambiar de vuelta a argv[3]
 
 	
 	char coordenadas[4];
-	int aciertosj1=0;
-	int aciertosj2=0;
 	bool gano= false;
+	int turno = 0;
 
-	// // //Si no se le pasan los argumentos al programa, termina solo.
-	// if (argc<4){
-	// 	printf("Faltan argumentos\n");
-	// 	return 0;
-	// }
+	// //Si no se le pasan los argumentos al programa, termina solo.
+	if (argc<4){
+		printf("Faltan argumentos\n");
+		return 0;
+	}
+
+	//Si es 1 (true) el modo es versus
+	if (tipo_juego(argv[1])){
+			while(!gano){
+				printf("Jugador 1\n");
+				print_tablero(arr2);
+
+				printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+				scanf("%s", coordenadas);
+				while (!ataque(tablaBarcosJ2, arr2, coordenadas)){
+					printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+					scanf("%s", coordenadas);
+				}
+				turno++;
+				if (termino(tablaBarcosJ2, turno)) return 0;
+
+				printf("Jugador 2\n");
+				print_tablero(arr1);
+
+				printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+				scanf("%s", coordenadas);
+				while (!ataque(tablaBarcosJ1, arr1, coordenadas)){
+					printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+					scanf("%s", coordenadas);
+				}
+				turno++;
+				if (termino(tablaBarcosJ1, turno)) return 0;
+
+			}
+	}
+
+	else //Si es 0 el modo es automatizado
+		if (tipo_juego(argv[1]) == 0){
+
+			while(!gano){
+				printf("Jugador 1\n");
+				print_tablero(arr2);
+
+				printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+				scanf("%s", coordenadas);
+				while (!ataque(tablaBarcosJ2, arr2, coordenadas)){
+					printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
+					scanf("%s", coordenadas);
+				}
+				turno++;
+				if (termino(tablaBarcosJ2, turno)) return 0;
+
+				printf("Jugador 2\n");
+				print_tablero(arr1);
+
+				coordenadasCPU(coordenadas);
+				ataque(tablaBarcosJ1, arr1, coordenadas);
+				turno++;
+				if (termino(tablaBarcosJ1, turno)) return 0;
+			}
 
 
 
-	// //Si es 1 (true) el modo es versus
-	// if (tipo_juego(argv[1])){
-	// 		while(!gano){
-	// 			printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
-	// 			scanf("%s", coordenadas);
-	// 			ataque(tablaBarcosJ1, arr1, aciertosj1, coordenadas);
-				
-	// 			printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
-	// 			scanf("%s", coordenadas);
-	// 			ataque(tablaBarcosJ2, arr2, aciertosj2, coordenadas);
-			
-	// 			if (longitud_barcos == aciertosj1){
-	// 				gano = true;
-	// 				printf("Gana jugador 1\n");
-	// 				return 0;
-	// 			}
-	// 			else 
-	// 				if(longitud_barcos == aciertosj2){
-	// 					gano = true;
-	// 					printf("Gana jugador 2\n");
-	// 					return 0;
-	// 				}
-	// 		}
-	// }
-
-	// else //Si es 0 el modo es automatizado
-	// 	if (tipo_juego(argv[1]) == 0){
-
-	// 		while(!gano){
-	// 			printf("Ingrese la coordenada de ataque: "); //pido las coordenadas de ataque
-	// 			scanf("%s", coordenadas);
-	// 			ataque(tablaBarcosJ1, arr1, aciertosj1, coordenadas);
-	// 			coordenadasCPU(coordenadas);
-	// 			ataque(tablaBarcosJ2, arr2, aciertosj2, coordenadas);
-		
-	// 			if (longitud_barcos == aciertosj1){
-	// 				gano = true;
-	// 				printf("Gana jugador 1\n");
-	// 				return 0;
-	// 			}
-	// 			else 
-	// 				if(longitud_barcos == aciertosj2){
-	// 					gano = true;
-	// 					printf("Gana jugador 2\n");
-	// 					return 0;
-	// 				}
-	// 		}
+	}
 
 
-
-	// }
-
-
-	// else printf("Modo de juego no valido.\n");
+	else printf("Modo de juego no valido.\n");
 
 	return 0;	
 }	

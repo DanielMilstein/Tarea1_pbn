@@ -1,1 +1,1 @@
-portaviones;5;A;1;h
+crucero;2;F;5;v
